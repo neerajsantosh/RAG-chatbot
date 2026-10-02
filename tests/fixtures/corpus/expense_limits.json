@@ -1,0 +1,8 @@
+{
+  "document_id": "doc-expense-limits",
+  "title": "Travel and Expense Limits",
+  "body": "Reimbursement for travel expenses requires a pre-approval form. Per diem allowances are 75 USD per day for domestic travel and 120 USD per day for international travel. Receipts must be submitted within 60 days of the expense date. Claims older than 90 days are not reimbursed.",
+  "acl_tags": ["finance"],
+  "visibility": "private",
+  "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000002"
+}

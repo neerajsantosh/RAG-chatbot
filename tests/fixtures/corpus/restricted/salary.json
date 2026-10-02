@@ -1,0 +1,8 @@
+{
+  "document_id": "doc-restricted-1",
+  "title": "Confidential Salary Schedule",
+  "body": "Senior engineer salary range: $150,000 - $200,000. Junior engineer salary range: $80,000 - $120,000. This document is highly confidential and should not be accessible to unauthorized personnel.",
+  "acl_tags": ["finance", "exec"],
+  "visibility": "private",
+  "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000005"
+}

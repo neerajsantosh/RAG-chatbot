@@ -1,0 +1,8 @@
+{
+  "document_id": "doc-remote-work-policy",
+  "title": "Remote Work Policy",
+  "body": "Employees may work remotely up to three days per week. Requests for additional remote days require manager approval. Equipment for home offices is provided through the IT service desk and must be returned within 30 days of a request to return office-based work.",
+  "acl_tags": ["hr"],
+  "visibility": "private",
+  "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000001"
+}

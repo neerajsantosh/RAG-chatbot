@@ -1,0 +1,15 @@
+{"id": "v1-001", "question": "What is our policy on annual leave carry-over?", "answerable": true, "relevant_document_ids": ["doc-hr-leave"], "stratum": "exact_term"}
+{"id": "v1-002", "question": "How many days of leave can I roll into next year?", "answerable": true, "relevant_document_ids": ["doc-hr-leave"], "stratum": "natural_language"}
+{"id": "v1-003", "question": "How much notice do I need to give before I leave?", "answerable": true, "relevant_document_ids": ["doc-hr-leave"], "stratum": "natural_language"}
+{"id": "v1-004", "question": "Who signs off on a new vendor contract above 50000?", "answerable": true, "relevant_document_ids": ["doc-procurement"], "stratum": "multi_document"}
+{"id": "v1-005", "question": "What is the approval chain for a contract over 50000?", "answerable": true, "relevant_document_ids": ["doc-procurement"], "stratum": "multi_document"}
+{"id": "v1-006", "question": "Which suppliers are on the approved vendor list?", "answerable": true, "relevant_document_ids": ["doc-procurement"], "relevant_chunk_ids": ["chunk-procurement-4"], "stratum": "multi_document"}
+{"id": "v1-007", "question": "Can I expense a home office chair?", "answerable": true, "relevant_document_ids": ["doc-expenses"], "stratum": "synonym"}
+{"id": "v1-008", "question": "Is a standing desk covered by the expenses policy?", "answerable": true, "relevant_document_ids": ["doc-expenses"], "stratum": "synonym"}
+{"id": "v1-009", "question": "What is the incident severity definition for a SEV1?", "answerable": true, "relevant_document_ids": ["doc-oncall"], "stratum": "exact_term"}
+{"id": "v1-010", "question": "Who do I page if production is down?", "answerable": true, "relevant_document_ids": ["doc-oncall"], "stratum": "natural_language"}
+{"id": "v1-011", "question": "What is the retention period for customer support tickets?", "answerable": true, "relevant_document_ids": ["doc-support"], "stratum": "natural_language"}
+{"id": "v1-012", "question": "How long do we keep audit logs?", "answerable": true, "relevant_document_ids": ["doc-security"], "stratum": "natural_language"}
+{"id": "v1-013", "question": "What is the average salary of the engineering team last quarter?", "answerable": false, "stratum": "unanswerable", "notes": "No compensation data in the corpus. The system must refuse rather than answer from prior knowledge."}
+{"id": "v1-014", "question": "What is next quarter's hiring plan?", "answerable": false, "stratum": "unanswerable", "notes": "Not documented anywhere in the corpus."}
+{"id": "v1-015", "question": "Do we still use the legacy VPN client?", "answerable": false, "stratum": "unanswerable", "notes": "Undocumented. A system that answers this from assumption is worse than one that refuses."}

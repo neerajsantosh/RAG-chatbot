@@ -1,0 +1,8 @@
+{
+  "document_id": "doc-onboarding",
+  "title": "Engineering Onboarding Checklist",
+  "body": "New engineers receive repository access on their first day. The onboarding checklist covers local environment setup, the deployment runbook, and the incident response process. Access to production systems requires completion of security training and a signed acceptable use policy.",
+  "acl_tags": ["engineering", "public"],
+  "visibility": "public",
+  "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000003"
+}

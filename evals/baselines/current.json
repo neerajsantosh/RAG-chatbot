@@ -1,0 +1,72 @@
+{
+  "dataset": {
+    "name": "golden-v1",
+    "path": "evals\\golden-v1.jsonl",
+    "question_count": 15,
+    "version": "v1"
+  },
+  "failures": [],
+  "retrieval": {
+    "by_stratum": {
+      "exact_term": {
+        "1": 0.0,
+        "10": 0.0,
+        "3": 0.0,
+        "5": 0.0
+      },
+      "multi_document": {
+        "1": 0.0,
+        "10": 0.0,
+        "3": 0.0,
+        "5": 0.0
+      },
+      "natural_language": {
+        "1": 0.0,
+        "10": 0.0,
+        "3": 0.0,
+        "5": 0.0
+      },
+      "synonym": {
+        "1": 0.0,
+        "10": 0.0,
+        "3": 0.0,
+        "5": 0.0
+      }
+    },
+    "hit_rate_at_k": {
+      "1": 0.0,
+      "10": 0.0,
+      "3": 0.0,
+      "5": 0.0
+    },
+    "mrr_at_k": {
+      "1": 0.0,
+      "10": 0.0,
+      "3": 0.0,
+      "5": 0.0
+    },
+    "ndcg_at_k": {
+      "1": 0.0,
+      "10": 0.0,
+      "3": 0.0,
+      "5": 0.0
+    },
+    "question_count": 12,
+    "recall_at_k": {
+      "1": 0.0,
+      "10": 0.0,
+      "3": 0.0,
+      "5": 0.0
+    }
+  },
+  "unanswerable_refusals": {
+    "correct_refusal_rate": 1.0,
+    "unanswerable_total": 3.0
+  },
+  "versions": {
+    "config_version": "phase1-unassigned",
+    "embedding_model": "fake",
+    "llm_model": "fake",
+    "prompt_version": "phase1-unassigned"
+  }
+}

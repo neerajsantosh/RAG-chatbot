@@ -1,0 +1,8 @@
+{
+  "document_id": "doc-restricted-2",
+  "title": "Executive Bonus Pool",
+  "body": "The annual bonus pool for executives is determined by company performance, individual ratings, and strategic objectives. Details are restricted to finance and executive team members only.",
+  "acl_tags": ["finance", "exec"],
+  "visibility": "private",
+  "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000006"
+}

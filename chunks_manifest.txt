@@ -1,0 +1,2 @@
+8f62ecfaf13417cbb5b061c4f74050e198b83a47c83c602348b2feb8fee1ee52 | docs\sample_docs\refund.txt | 0 | 14 | 14 | yþthe refund policy allows returns within 30 days of purchase. | rag-operators,rag-admins
+aa89b3339bbd63484301b06de74483b7545d369adcb8892dee47fd9d6a507237 | docs\sample_docs\warranty.txt | 0 | 12 | 12 | yþthe warranty covers manufacturing defects for one year. | rag-operators,rag-admins

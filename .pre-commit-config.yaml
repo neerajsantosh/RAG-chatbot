@@ -1,0 +1,49 @@
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: '\.(md|jsonl)$'
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-case-conflict
+      - id: check-yaml
+        args: ["--allow-multiple-documents"]
+      - id: check-toml
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.2
+    hooks:
+      - id: mypy
+        additional_dependencies: [pydantic, types-PyYAML]
+        files: ^(packages|apps)/
+
+  # Fails on committed credentials. Mirrors `make check-secrets`.
+  - repo: local
+    hooks:
+      - id: check-secrets
+        name: check committed secrets
+        entry: python tools/check_secrets.py
+        language: system
+        pass_filenames: false
+
+      # Enforces NFR-16: no code path may log content-bearing fields.
+      - id: check-log-hygiene
+        name: check log content hygiene
+        entry: python tools/check_log_hygiene.py
+        language: system
+        pass_filenames: false
