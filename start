@@ -8,7 +8,7 @@ def main():
     port = os.environ.get("PORT", "8000")
     port = str(int(port))  # ensure it's a clean integer string
     
-    api_base = f"http://localhost:{port}"
+    api_base = f"http://localhost:{port}/v1"
     os.environ["API_BASE"] = api_base
     
     # Start FastAPI uvicorn in background process
