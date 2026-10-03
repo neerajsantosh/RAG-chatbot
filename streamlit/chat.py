@@ -8,6 +8,7 @@ Features:
 - Keyboard-friendly (Enter sends)
 """
 
+import os
 import streamlit as st
 import requests
 import json
