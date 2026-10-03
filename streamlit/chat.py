@@ -8,6 +8,7 @@ Features:
 - Keyboard-friendly (Enter sends)
 """
 
+import os
 import streamlit as st
 import requests
 import json
@@ -18,7 +19,7 @@ from typing import Optional
 # Configuration
 # ---------------------------------------------------------------------------
 
-API_BASE = "http://localhost:8000"
+API_BASE = os.environ.get("API_BASE", "http://localhost:8000")
 DEFAULT_GROQ_MODEL = "qwen/qwen3.8-27b"
 DEFAULT_K = 6
 
