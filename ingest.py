@@ -188,11 +188,8 @@ def main():
     client = chromadb.PersistentClient(path="./chroma_db")
     collection = client.get_or_create_collection(name="hdfc_funds")
 
-    # optional: delete any previous vectors – guarantees a clean slate each build
-    # (the build command already does `rm -rf chroma_db`, but we keep it here
-    #  for safety if someone runs ingest.py standalone.)
-    collection.delete_ids(ids=collection.get(include=[])["ids"])
-
+    # The build command (`rm -rf chroma_db`) already guarantees a clean slate,
+    # so we skip any per‑run deletion here.
     for entry in all_chunks:
         emb = embed_chunk(entry["text"])
         # Guard: ensure exactly 384 dimensions
