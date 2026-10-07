@@ -1,0 +1,14 @@
+# Virtual environment
+.venv/
+env/
+
+# ChromaDB persistence
+chroma_db/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables (keep API keys out of repo)
+.env
