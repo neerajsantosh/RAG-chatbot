@@ -5,7 +5,6 @@ This app wraps the Phase‑5 retrieval+LLM pipeline (query.py) in a web‑style
 interface.  It reads the Groq API key from the existing `.env` file and
 displays the answer together with the retrieved chunks for transparency.
 """
-
 import os
 import sys
 
@@ -16,30 +15,42 @@ load_dotenv()
 import streamlit as st
 
 # ----------------------------------------------------------------------
-# Import the RAG pipeline from query.py (same environment)
+# 1️⃣ Load the HuggingFace embedding model (same as ingest/query)
 # ----------------------------------------------------------------------
-# The query module already checks for GROQ_API_KEY and exits if missing.
-# We simply import the ask_question function; if the key is absent the
-# script will exit when the user clicks “Submit”.
-# ----------------------------------------------------------------------
-# Import after dotenv load so the key is available.
-# ----------------------------------------------------------------------
-# To avoid circular imports we simply call the pipeline inline.
-# We'll re‑implement the minimal logic needed (embed, retrieve, Groq call)
-# using the same code that is in query.py but adapted for Streamlit.
-# ----------------------------------------------------------------------
+from transformers import AutoTokenizer, AutoModel
 
-import re
-import json
-from typing import List, Tuple, Dict, Any
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+DEVICE = "cpu"
 
-from sentence_transformers import SentenceTransformer
+_tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+_model = AutoModel.from_pretrained(MODEL_NAME)
+_model.to(DEVICE)
+_model.eval()                     # disables gradient tracking
+
+
+def _embed_text(text: str) -> list:
+    """Return a 384‑dim embedding for *text* (used by ingest/query)."""
+    inputs = _tokenizer(
+        text,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512,
+    ).to(DEVICE)
+
+    with torch.no_grad():
+        outputs = _model(**inputs)
+    pooling = torch.mean(outputs.last_hidden_state, dim=1).squeeze(0)
+    return pooling.cpu().numpy().tolist()
+
+
+# ----------------------------------------------------------------------
+# 2️⃣ Initialise ChromaDB (persistent, same collection as ingest/query)
+# ----------------------------------------------------------------------
 import chromadb
 from groq import Groq
+from dotenv import load_dotenv
 
-# ----------------------------------------------------------------------
-# Configuration (same as query.py)
-# ----------------------------------------------------------------------
+load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = "qwen/qwen3.8-27b"
 
@@ -50,16 +61,17 @@ if not GROQ_API_KEY:
     )
     st.stop()
 
-embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
-collection = chroma_client.get_collection("hdfc_funds")
+collection = chroma_client.get_collection("hdfc_funds")   # 45 chunks already stored
+
 
 # ----------------------------------------------------------------------
-# Helper functions (mirror those in query.py)
+# 3️⃣ Helper functions (mirror those in query.py)
 # ----------------------------------------------------------------------
-def retrieve(question: str, k: int = 4) -> Dict[str, Any]:
-    q_emb = embed_model.encode(question).tolist()
+def retrieve(question: str, k: int = 2) -> dict:
+    """Embed the question and return the top‑k ChromaDB results."""
+    # use the same embedding function defined above
+    q_emb = _embed_text(question)
     results = collection.query(
         query_embeddings=[q_emb],
         n_results=k,
@@ -71,7 +83,8 @@ def retrieve(question: str, k: int = 4) -> Dict[str, Any]:
     return results
 
 
-def build_context(results: Dict[str, Any]) -> str:
+def build_context(results: dict) -> str:
+    """Turn the query result into a single string prompt fragment."""
     docs = results.get("documents", [[]])[0] if results else []
     metas = results.get("metadatas", [[]])[0] if results else []
     parts = []
@@ -83,6 +96,7 @@ def build_context(results: Dict[str, Any]) -> str:
 
 
 def ask_groq(context: str, question: str) -> str:
+    """Call Groq and return the model's answer."""
     client = Groq(api_key=GROQ_API_KEY)
     prompt = f"""Answer the user's question using ONLY the context below. If the answer is not present, say "I don't have that information in the provided HDFC fund data."
 
@@ -103,7 +117,8 @@ Question: {question}
         return f"Error contacting Groq: {e}"
 
 
-def ask_question(question: str, k: int = 4) -> Tuple[str, Dict[str, Any]]:
+def ask_question(question: str, k: int = 2) -> tuple:
+    """Full pipeline: retrieve → context → LLM answer."""
     results = retrieve(question, k=k)
     context = build_context(results)
     answer = ask_groq(context, question)
@@ -111,7 +126,7 @@ def ask_question(question: str, k: int = 4) -> Tuple[str, Dict[str, Any]]:
 
 
 # ----------------------------------------------------------------------
-# Streamlit UI
+# 4️⃣ Streamlit UI
 # ----------------------------------------------------------------------
 st.set_page_config(page_title="HDFC Mutual Fund RAG", page_icon="💹")
 
@@ -133,7 +148,7 @@ if st.button("Submit"):
         st.warning("Please enter a question.")
     else:
         with st.spinner("Thinking…"):
-            answer, retrieval = ask_question(user_question, k=4)
+            answer, retrieval = ask_question(user_question, k=2)
 
         st.subheader("Answer")
         st.write(answer)
