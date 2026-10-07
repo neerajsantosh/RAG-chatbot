@@ -20,14 +20,49 @@ Responsibilities (as described in implementation.md §5):
   • Return the LLM's grounded answer to the user.
   • Simple CLI UI: `python query.py "<your question>"`.
 """
+
 import os
 import sys
 import json
 import re
 from typing import List, Tuple, Dict, Any
 
-from sentence_transformers import SentenceTransformer
+import streamlit as st
+
+# ----------------------------------------------------------------------
+# 1️⃣ Load the HuggingFace embedding model (same as ingest.py)
+# ----------------------------------------------------------------------
+from transformers import AutoTokenizer, AutoModel
+
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+DEVICE = "cpu"
+
+_tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+_model = AutoModel.from_pretrained(MODEL_NAME)
+_model.to(DEVICE)
+_model.eval()                     # disables gradient tracking
+
+
+def _embed_text(text: str) -> List[float]:
+    """Return a 384‑dim embedding for *text* (used by both ingest and query)."""
+    inputs = _tokenizer(
+        text,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512,
+    ).to(DEVICE)
+
+    with torch.no_grad():
+        outputs = _model(**inputs)
+    pooling = torch.mean(outputs.last_hidden_state, dim=1).squeeze(0)
+    return pooling.cpu().numpy().tolist()
+
+
+# ----------------------------------------------------------------------
+# 2️⃣ Initialise ChromaDB (persistent, same collection as ingest.py)
+# ----------------------------------------------------------------------
 import chromadb
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,18 +73,16 @@ if not GROQ_API_KEY:
     print("Error: GROQ_API_KEY not set. Add it to .env (see .env.example).", file=sys.stderr)
     sys.exit(1)
 
-# Initialise embedding model and ChromaDB vector store
-embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 collection = chroma_client.get_collection("hdfc_funds")   # 45 chunks already stored
 
+
 # ----------------------------------------------------------------------
-# Helper functions
+# 3️⃣ Helper functions
 # ----------------------------------------------------------------------
-def retrieve(question: str, k: int = 4) -> Dict[str, Any]:
+def retrieve(question: str, k: int = 2) -> Dict[str, Any]:
     """Embed the question and return the top‑k ChromaDB results."""
-    q_emb = embed_model.encode(question).tolist()
+    q_emb = _embed_text(question)
     results = collection.query(
         query_embeddings=[q_emb],
         n_results=k,
@@ -76,8 +109,6 @@ def build_context(results: Dict[str, Any]) -> str:
 
 def ask_groq(context: str, question: str) -> str:
     """Call Groq and return the model's answer."""
-    from groq import Groq
-
     client = Groq(api_key=GROQ_API_KEY)
     prompt = f"""Answer the user's question using ONLY the context below. If the answer is not present, say "I don't have that information in the provided HDFC fund data."
 
@@ -98,7 +129,7 @@ Question: {question}
         return f"Error contacting Groq: {e}"
 
 
-def ask_question(question: str, k: int = 4) -> Tuple[str, Dict[str, Any]]:
+def ask_question(question: str, k: int = 2) -> Tuple[str, Dict[str, Any]]:
     """Full pipeline: retrieve → context → LLM answer."""
     results = retrieve(question, k=k)
     context = build_context(results)
@@ -106,9 +137,9 @@ def ask_question(question: str, k: int = 4) -> Tuple[str, Dict[str, Any]]:
     return answer, results
 
 
-# --------------------------------------------------------------
-# CLI entry point
-# --------------------------------------------------------------
+# ----------------------------------------------------------------------
+# 5. CLI entry point
+# ----------------------------------------------------------------------
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(
@@ -119,11 +150,16 @@ if __name__ == "__main__":
 
     user_question = " ".join(sys.argv[1:])
 
-    answer, retrieval = ask_question(user_question, k=4)
+    answer, retrieval = ask_question(user_question, k=2)
 
+    # ------------------------------------------------------------------
+    # Display the LLM answer (or the error message returned by Groq)
+    # ------------------------------------------------------------------
     print("\n=== Answer ===\n", answer, "\n")
 
+    # ------------------------------------------------------------------
     # Show the retrieved chunks (for reference)
+    # ------------------------------------------------------------------
     docs = retrieval.get("documents", [[]])[0] if retrieval else []
     metas = retrieval.get("metadatas", [[]])[0] if retrieval else []
     ids = retrieval.get("ids", [[]])[0] if retrieval else []
