@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import streamlit as st
+import torch
+torch.set_num_threads(1)
 
 # ----------------------------------------------------------------------
 # 1️⃣ Load the HuggingFace embedding model (same as ingest/query)
@@ -122,7 +124,8 @@ def ask_question(question: str, k: int = 2) -> tuple:
     results = retrieve(question, k=k)
     context = build_context(results)
     answer = ask_groq(context, question)
-    return answer, results
+    gc.collect()
+return answer, results
 
 
 # ----------------------------------------------------------------------

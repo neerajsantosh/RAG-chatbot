@@ -8,6 +8,7 @@ import sqlite3
 from typing import List, Dict
 
 import torch
+torch.set_num_threads(1)
 from transformers import AutoTokenizer, AutoModel
 import chromadb
 from dotenv import load_dotenv
@@ -204,6 +205,7 @@ def main():
 
     # ChromaDB PersistentClient already writes to disk; no explicit persist needed.
     print(f"✅  Ingestion complete – {len(all_chunks)} chunks embedded in chroma_db/")
+gc.collect()
 
 
 if __name__ == "__main__":
