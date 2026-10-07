@@ -202,8 +202,7 @@ def main():
             documents=[entry["text"]],
         )
 
-    # Persist to disk (Chroma does this automatically, but we explicit‑ly call)
-    collection.persist()
+    # ChromaDB PersistentClient already writes to disk; no explicit persist needed.
     print(f"✅  Ingestion complete – {len(all_chunks)} chunks embedded in chroma_db/")
 
 
