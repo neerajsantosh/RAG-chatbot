@@ -10,6 +10,12 @@ import sys
 from dotenv import load_dotenv
 load_dotenv()
 
+# ---- memory‑saving env vars (Render free‑tier) ----
+os.environ["PYTORCH_NUM_THREADS"] = "1"
+os.environ["WEB_CONCURRENCY"]   = "1"
+os.environ["OMP_NUM_THREADS"]   = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 import streamlit as st
 import torch
 torch.set_num_threads(1)
@@ -34,7 +40,7 @@ def _embed_text(text: str) -> list:
         text,
         return_tensors="pt",
         truncation=True,
-        max_length=512,
+        max_length=256,
     ).to(DEVICE)
 
     with torch.no_grad():
@@ -68,7 +74,7 @@ collection = chroma_client.get_collection("hdfc_funds")   # 45 chunks already st
 # ----------------------------------------------------------------------
 # 3️⃣ Helper functions (mirror those in query.py)
 # ----------------------------------------------------------------------
-def retrieve(question: str, k: int = 2) -> dict:
+def retrieve(question: str, k: int = 1) -> dict:
     """Embed the question and return the top‑k ChromaDB results."""
     # use the same embedding function defined above
     q_emb = _embed_text(question)
@@ -117,11 +123,13 @@ Question: {question}
         return f"Error contacting Groq: {e}"
 
 
-def ask_question(question: str, k: int = 2) -> tuple:
+def ask_question(question: str, k: int = 1) -> tuple:
     """Full pipeline: retrieve → context → LLM answer."""
     results = retrieve(question, k=k)
     context = build_context(results)
     answer = ask_groq(context, question)
+    del results, context, answer
+    import gc
     gc.collect()
     return answer, results
 
@@ -149,7 +157,7 @@ if st.button("Submit"):
         st.warning("Please enter a question.")
     else:
         with st.spinner("Thinking…"):
-            answer, retrieval = ask_question(user_question, k=2)
+            answer, retrieval = ask_question(user_question, k=1)
 
         st.subheader("Answer")
         st.write(answer)
