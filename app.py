@@ -7,8 +7,6 @@ displays the answer together with the retrieved chunks for transparency.
 """
 import os
 import sys
-
-# Ensure the .env file is loaded before any other imports
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -125,7 +123,7 @@ def ask_question(question: str, k: int = 2) -> tuple:
     context = build_context(results)
     answer = ask_groq(context, question)
     gc.collect()
-return answer, results
+    return answer, results
 
 
 # ----------------------------------------------------------------------
