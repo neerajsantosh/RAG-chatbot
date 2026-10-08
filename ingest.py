@@ -18,8 +18,8 @@ load_dotenv()
 # ----------------------------------------------------------------------
 # 1️⃣ Configuration
 # ----------------------------------------------------------------------
-CHUNK_SIZE = 512      # tokens (approx. 800‑900 chars)
-CHUNK_OVERLAP = 64    # tokens
+CHUNK_SIZE = 144      # tokens (approx. 220-230?chars)
+CHUNK_OVERLAP = 16    # tokens
 EMBEDDING_DIM = 384   # MiniLM‑L6‑v2 dimension
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"   # hugging‑face repo id
 DEVICE = "cpu"        # Render free tier has no GPU
